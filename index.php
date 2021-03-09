@@ -93,10 +93,10 @@ QRoute::GET('/test/{as}')
     });
 
 
-QRoute::GET('/hi/{name:(Raphael)}')
+QRoute::GET('/hi/{name:(\d\d\d)}')
     ->setCallback(function ($name) {
         
-        return ['test' => true, 'msg' => "Hi $name!"];
+        return ['test' => true, 'msg' => "Hello agent $name!"];
         
     });
 
