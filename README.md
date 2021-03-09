@@ -46,7 +46,8 @@ include("vendor/autoload.php");
 
 use Quintao\QRoute;
 
-QRoute::HEADERS(['Access-Control-Allow-Origin' => (@$_SERVER['HTTP_ORIGIN']) ?: '*']); // Enable Cors
+// Set up global Headers
+QRoute::HEADERS(['Access-Control-Allow-Origin' => (@$_SERVER['HTTP_ORIGIN']) ?: '*']);
 QRoute::HEADERS(['Access-Control-Allow-Methods' => 'GET, POST, PUT, DELETE, OPTIONS, HEAD']);
 QRoute::HEADERS(['Access-Control-Allow-Headers' => 'DEV, cookie, *']);
 QRoute::HEADERS(['Access-Control-Allow-Credentials' => 'true']);
@@ -91,7 +92,8 @@ QRoute::HREGISTER('401', function () {
     QRoute::HEADERS(['HTTP/1.1' => '401 Unauthorized']);
     QRoute::HEADERS(['Content-Type' => 'application/json']);
     
-    return $resp;
+    echo json_encode($resp);
+    exit(); // Doing that HandleReturn is not called.
 });
 
 
