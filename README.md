@@ -25,7 +25,7 @@ RewriteRule ^(.*)$ index.php/$1
 ### Settings up Nginx
 You can enable url-rewriting by adding the following configuration for the Nginx configuration-file.
 
-```
+```nginx
 location / {
     try_files $uri $uri/ /index.php?$query_string;
 }
