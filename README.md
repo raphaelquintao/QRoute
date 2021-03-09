@@ -52,7 +52,7 @@ QRoute::HEADERS(['Access-Control-Allow-Headers' => 'DEV, cookie, *']);
 QRoute::HEADERS(['Access-Control-Allow-Credentials' => 'true']);
 
 // ORDERS MATTERS, so always put the functions in right order.
-// If using HandleReturn this needs to be the fisrt funtion,
+// If using HandleReturn this needs to be the first function,
 // following by the errors handlers and the urls 
 
 
