@@ -84,8 +84,11 @@ namespace Quintao {
         }
         
         private static function match_url($url_pattern, $request_url, &$out = null) {
-            static $COMPILE_REGEX = /** @lang PhpRegExpCommentMode */
-                '@(?<=/){(?<var>[a-z0-9_]+):?(?<reg>(?:\[[\w\d\-\\\./]+\](?:\+|\*|{(?:[0-9]+|[0-9]+,[0-9]*)})?)+|)}(?=\s*(?:/|$))@ix';
+//            static $COMPILE_REGEX = /** @lang PhpRegExpCommentMode */
+//                '@(?<=/){(?<var>[a-z0-9_]+):?(?<reg>(?:\[[\w\d\-\\\./]+\](?:\+|\*|{(?:[0-9]+|[0-9]+,[0-9]*)})?)+|)}(?=\s*(?:/|$))@ix';
+            
+            static $COMPILE_REGEX = /** @lang PhpRegExp */
+                '@(?<=/){(?<var>[a-z0-9_]+):?(?<reg>(?:(?:\[{0,1}[\w\d\-\\\./]+\]{0,1}(?:\+|\*|{(?:[0-9]+|[0-9]+,[0-9]*)})?)+|(?:\({0,1}[\w\d\-\\\./\[\]]+\){0,1}(?:\+|\*|{(?:[0-9]+|[0-9]+,[0-9]*)})?)+)+|)}(?=\s*(?:/|$))@ix';
 
 //            qDebug('URL_PATTERN: ', $url_pattern);
 //            qDebug('Request Url: ', $request_url, "\n");

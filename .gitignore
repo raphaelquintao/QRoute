@@ -1,1 +1,5 @@
 /.idea/
+/.htaccess
+/composer.phar
+/composer.lock
+/vendor/

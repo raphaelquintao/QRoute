@@ -1,0 +1,26 @@
+{
+  "name": "quintao/qroute",
+  "description": "Powerfull and Simple PHP Route library. Just one file. ",
+  "type": "library",
+  "keywords": [
+    "route",
+    "router",
+    "routing"
+  ],
+  "homepage": "https://github.com/raphaelquintao/QRoute",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Raphael Quintão Silveira",
+      "homepage": "https://github.com/raphaelquintao"
+    }
+  ],
+  "require": {
+    "php": ">=5.6"
+  },
+  "autoload": {
+    "psr-4": {
+      "Quintao\\": "src/"
+    }
+  }
+}
