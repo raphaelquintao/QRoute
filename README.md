@@ -88,7 +88,6 @@ QRoute::HREGISTER('401', function () {
     QRoute::HEADERS(['HTTP/1.1' => '401 Unauthorized']);
     QRoute::HEADERS(['Content-Type' => 'application/json']);
     
-    
     return $resp;
 });
 
@@ -96,9 +95,6 @@ QRoute::HREGISTER('401', function () {
 // Set base url of the main router file, remove if you route file in on root diretory.
 // In that case the index.php is under http://mysite.com/test/QRoute
 QRoute::BaseURL('/test/QRoute'); 
-
-
-
 
 QRoute::GET('/')
     ->setCallback(function () {
