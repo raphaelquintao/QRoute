@@ -1,11 +1,13 @@
 {
   "name": "quintao/qroute",
-  "description": "Powerfull and Simple PHP Route library. Just one file. ",
+  "description": "Powerfull, Simple, Single File PHP Route library. Just one file. ",
   "type": "library",
   "keywords": [
     "route",
     "router",
-    "routing"
+    "routing",
+    "single file",
+    "dependency free"
   ],
   "homepage": "https://github.com/raphaelquintao/QRoute",
   "license": "MIT",
