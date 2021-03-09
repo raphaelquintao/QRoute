@@ -3,6 +3,8 @@
 Powerfull and Simple PHP Route library. Just one file. 
 
 ## Instalation
+Navigate to your project folder in terminal and run the following command:
+`composer require quintao/qroute`
 
 ### Setting up Apache
 
