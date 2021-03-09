@@ -277,13 +277,13 @@ namespace Quintao {
                 
                 if (self::$func_return === null) self::$func_return = '';
                 
-                self::catchErrors();
+                self::finish();
                 
             }
             
         }
         
-        static function catchErrors() {
+        static function finish() {
             if (self::$func_handle_return === null)
                 self::$func_handle_return = function ($content) {
                     print_r($content);

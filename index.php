@@ -41,6 +41,17 @@ QRoute::NotFound(function () {
     return $resp;
 });
 
+QRoute::HREGISTER('401', function () {
+    $resp['error'] = true;
+    $resp['msg'] = 'Unauthorized';
+    
+    QRoute::HEADERS(['HTTP/1.1' => '401 Unauthorized']);
+    QRoute::HEADERS(['Content-Type' => 'application/json']);
+    
+    
+    return $resp;
+});
+
 
 QRoute::BaseURL('/test/QRoute');
 
@@ -120,4 +131,4 @@ QRoute::GET('/hi/{name}')
 
 
 
-QRoute::catchErrors();
+QRoute::finish();

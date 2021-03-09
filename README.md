@@ -2,8 +2,11 @@
 
 Powerfull and Simple PHP Route library. Just one file. 
 
+## Instalation
 
 ### Setting up Apache
+
+Make sure the mod_rewrite module (htaccess support) is enabled in the Apache configuration.
 
 Simply create a new `.htaccess` file in your projects public directory and paste the contents below in your newly created file. 
 This will redirect all requests to your `index.php` file.
@@ -16,13 +19,25 @@ RewriteCond %{SCRIPT_FILENAME} !-l
 RewriteRule ^(.*)$ index.php/$1
 ```
 
-### Settings up NGinx
-...
+### Settings up Nginx
+You can enable url-rewriting by adding the following configuration for the Nginx configuration-file.
+
+```
+location / {
+    try_files $uri $uri/ /index.php?$query_string;
+}
+```
 
 ### Supported methods
-GET, POST, PUT, PATCH, DELETE, OPTIONS
+* GET
+* POST
+* PUT 
+* PATCH
+* DELETE 
+* OPTIONS
 
-### Example 
+## Routes Example
+
 ```php
 include("vendor/autoload.php");
 
@@ -32,6 +47,10 @@ QRoute::HEADERS(['Access-Control-Allow-Origin' => (@$_SERVER['HTTP_ORIGIN']) ?: 
 QRoute::HEADERS(['Access-Control-Allow-Methods' => 'GET, POST, PUT, DELETE, OPTIONS, HEAD']);
 QRoute::HEADERS(['Access-Control-Allow-Headers' => 'DEV, cookie, *']);
 QRoute::HEADERS(['Access-Control-Allow-Credentials' => 'true']);
+
+// Order matters, so always put the urls in right order.
+// If using HandleReturn this needs to be the fisrt funtion,
+// following by the errors handlers and the urls 
 
 
 // Hadling Returns Globaly
@@ -43,12 +62,43 @@ QRoute::HandleReturn(function ($resp) {
     echo json_encode($r);
 });
 
+// Handling Errors
+QRoute::BadRequest(function () {
+    $resp['error'] = true;
+    $resp['msg'] = 'Bad Request';
+
+    QRoute::HEADERS(['HTTP/1.1' => '400 Bad Request']);
+
+    return $resp;
+});
+
+QRoute::NotFound(function () {
+    $resp['error'] = true;
+    $resp['msg'] = 'Route Not Found';
+
+    QRoute::HEADERS(['HTTP/1.1' => '404 Not Found']);
+
+    return $resp;
+});
+
+QRoute::HREGISTER('401', function () {
+    $resp['error'] = true;
+    $resp['msg'] = 'Unauthorized';
+    
+    QRoute::HEADERS(['HTTP/1.1' => '401 Unauthorized']);
+    QRoute::HEADERS(['Content-Type' => 'application/json']);
+    
+    
+    return $resp;
+});
+
+
 // Set base url of the main router file, remove if you route file in on root diretory.
 // In that case the index.php is under http://mysite.com/test/QRoute
 QRoute::BaseURL('/test/QRoute'); 
 
 
-// Order matters, so always put the urls in right order.
+
 
 QRoute::GET('/')
     ->setCallback(function () {
@@ -84,5 +134,9 @@ QRoute::POST('/hi/{name}')
 
         return [$p, $name];
     });
+
+// Process all functions above. This is a mandatory function.
+// This needs to be the last function and is called only once. 
+QRoute::finish();
 
 ```
