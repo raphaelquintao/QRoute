@@ -51,7 +51,7 @@ QRoute::HEADERS(['Access-Control-Allow-Methods' => 'GET, POST, PUT, DELETE, OPTI
 QRoute::HEADERS(['Access-Control-Allow-Headers' => 'DEV, cookie, *']);
 QRoute::HEADERS(['Access-Control-Allow-Credentials' => 'true']);
 
-// Order matters, so always put the urls in right order.
+// ORDERS MATTERS, so always put the functions in right order.
 // If using HandleReturn this needs to be the fisrt funtion,
 // following by the errors handlers and the urls 
 
