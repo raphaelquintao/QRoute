@@ -1,8 +1,8 @@
 # QRoute
 
-Powerfull and Simple PHP Route library. Just one file. 
+Powerful and Simple PHP Route library. Just one file. 
 
-## Instalation
+## Installation
 Navigate to your project folder in terminal and run the following command:
 
 `composer require quintao/qroute`
@@ -42,7 +42,7 @@ location / {
 ## Routes Example
 
 ```php
-include("vendor/autoload.php");
+require 'vendor/autoload.php';
 
 use Quintao\QRoute;
 
@@ -57,7 +57,7 @@ QRoute::HEADERS(['Access-Control-Allow-Credentials' => 'true']);
 // following by the errors handlers and the urls 
 
 
-// Hadling Returns Globaly
+// Handling Returns Globally
 QRoute::HandleReturn(function ($resp) {
     QRoute::HEADERS(['Content-Type' => 'application/json']);
 
