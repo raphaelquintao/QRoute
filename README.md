@@ -9,7 +9,7 @@ Navigate to your project folder in terminal and run the following command:
 
 ### Setting up Apache
 
-Make sure the mod_rewrite module (htaccess support) is enabled in the Apache configuration.
+Make sure the `mod_rewrite` module (htaccess support) is enabled in the Apache configuration.
 
 Simply create a new `.htaccess` file in your projects public directory and paste the contents below in your newly created file. 
 This will redirect all requests to your `index.php` file.
