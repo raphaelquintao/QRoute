@@ -2,7 +2,7 @@
   "name": "quintao/qroute",
   "description": "Powerful and Simple single file PHP Route library.",
   "type": "library",
-  "minimum-stability": "dev-master",
+  "minimum-stability": "dev",
   "keywords": [
     "route",
     "router",
