@@ -132,9 +132,9 @@ QRoute::GET('/hi/{name}')
 QRoute::POST('/hi/{name}')
     ->setParams(null, ['p1', 'p2']) // First group required, second group optional
     // Post params always goes as last argument on callback function
-    ->setCallback(function ($p, $name) {
+    ->setCallback(function ($name, $p) {
 
-        return [$p, $name];
+        return [$name, $p];
     });
 
 // Process all functions above. This is a mandatory function.
