@@ -12,14 +12,15 @@ Navigate to your project folder in terminal and run the following command:
 Make sure the `mod_rewrite` module (htaccess support) is enabled in the Apache configuration.
 
 Simply create a new `.htaccess` file in your projects public directory and paste the contents below in your newly created file. 
-This will redirect all requests to your `index.php` file.
+This will redirect all requests to your `routes.php` file.
 
 ```apache
+DirectoryIndex routes.php
 RewriteEngine on
 RewriteCond %{SCRIPT_FILENAME} !-f
 RewriteCond %{SCRIPT_FILENAME} !-d
 RewriteCond %{SCRIPT_FILENAME} !-l
-RewriteRule ^(.*)$ index.php/$1
+RewriteRule ^(.*)$ routes.php/$1
 ```
 
 ### Settings up Nginx
@@ -130,7 +131,7 @@ QRoute::GET('/hi/{name}')
 // Post with params
 QRoute::POST('/hi/{name}')
     ->setParams(null, ['p1', 'p2']) // First group required, second group optional
-    // Post params always goes as first argument on callback function
+    // Post params always goes as last argument on callback function
     ->setCallback(function ($p, $name) {
 
         return [$p, $name];
