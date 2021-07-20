@@ -136,14 +136,8 @@ QRoute::PUT('/login/{url_param}')
     ->setParams([], ['password'])
     ->setQuery([], ['q1', 'q2' ])
     ->setCallback(function ($url_param, $body_param, $query_param) {
-//        $password = $p['password'];
-//        $password = QRoute::InputPOST('password');
-//        parse_str(file_get_contents("php://input", "r"), $password);
-//        $password = $_POST;
 
-//        if ($passwd == $password) {
-//            $session->start();
-//        }
+
         return [
             'url_param' => $url_param,
             'body_param' => $body_param,
