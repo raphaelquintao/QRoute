@@ -16,9 +16,9 @@ QRoute::HEADERS(['Access-Control-Allow-Credentials' => 'true']);
 
 QRoute::HandleReturn(function ($resp) {
     QRoute::HEADERS(['Content-Type' => 'application/json']);
-
+    
     $r['result'] = $resp;
-
+    
     echo json_encode($r);
 });
 
@@ -26,18 +26,18 @@ QRoute::HandleReturn(function ($resp) {
 QRoute::BadRequest(function () {
     $resp['error'] = true;
     $resp['msg'] = 'Bad Request';
-
+    
     QRoute::HEADERS(['HTTP/1.1' => '400 Bad Request']);
-
+    
     return $resp;
 });
 
 QRoute::NotFound(function () {
     $resp['error'] = true;
     $resp['msg'] = 'Route Not Found';
-
+    
     QRoute::HEADERS(['HTTP/1.1' => '404 Not Found']);
-
+    
     return $resp;
 });
 
@@ -84,13 +84,11 @@ QRoute::POST('/test2/{as:(ok)}')
 
 //        $p[] = QRoute::InputGET('p1');
 //        $p = QRoute::InputPOST('p1');
-        
+
 //        return [$as, $p];
         
         return [$as];
     });
-
-
 
 
 QRoute::GET('/test/{as}')
@@ -114,7 +112,7 @@ QRoute::GET('/hi/{name:(\d\d\d)}')
 QRoute::GET('/hi/{name}')
     ->setQuery(['age'])
     ->setCallback(function ($name, $q) {
-        
+
 //        $age = QRoute::InputGET('age');
         
         return ['test' => true, 'msg' => "Hello {$q['age']} years old $name"];
@@ -123,12 +121,23 @@ QRoute::GET('/hi/{name}')
 
 QRoute::GET('/hi/{name}')
     ->setCallback(function ($name) {
-
+        
         return ['test' => true, 'msg' => "Hello $name"];
-
+        
     });
 
-
+QRoute::PUT('/login/{url_param}')
+    ->setParams([], ['password'])
+    ->setQuery([], ['q1', 'q2'])
+    ->setCallback(function ($url_param, $body_param, $query_param) {
+        
+        
+        return [
+            'url_param' => $url_param,
+            'body_param' => $body_param,
+            'query_param' => $query_param
+        ];
+    });
 
 
 QRoute::finish();

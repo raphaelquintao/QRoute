@@ -1,8 +1,9 @@
 # QRoute
 
-Powerful and Simple PHP Route library. Just one file. 
+Powerful and Simple PHP Route library. Just one file.
 
 ## Installation
+
 Navigate to your project folder in terminal and run the following command:
 
 `composer require quintao/qroute`
@@ -11,19 +12,19 @@ Navigate to your project folder in terminal and run the following command:
 
 Make sure the `mod_rewrite` module (htaccess support) is enabled in the Apache configuration.
 
-Simply create a new `.htaccess` file in your projects public directory and paste the contents below in your newly created file. 
-This will redirect all requests to your `routes.php` file.
+Simply create a new `.htaccess` file in your projects public directory and paste the contents below in your newly
+created file. This will redirect all requests to your `index.php` file.
 
 ```apache
-DirectoryIndex routes.php
 RewriteEngine on
 RewriteCond %{SCRIPT_FILENAME} !-f
 RewriteCond %{SCRIPT_FILENAME} !-d
 RewriteCond %{SCRIPT_FILENAME} !-l
-RewriteRule ^(.*)$ routes.php/$1
+RewriteRule ^(.*)$ index.php/$1
 ```
 
 ### Settings up Nginx
+
 You can enable url-rewriting by adding the following configuration for the Nginx configuration-file.
 
 ```nginx
@@ -33,11 +34,12 @@ location / {
 ```
 
 ### Supported methods
+
 * GET
 * POST
-* PUT 
+* PUT
 * PATCH
-* DELETE 
+* DELETE
 * OPTIONS
 
 ## Routes Example
@@ -97,10 +99,16 @@ QRoute::HREGISTER('401', function () {
     exit(); // Doing that HandleReturn is not called.
 });
 
+// Helper function to return raw png data
+QRoute::HREGISTER('raw_png', function ($binary_data) {
+    QRoute::HEADERS(['Content-Type' => 'image/png']);
+    echo $binary_data;
+    exit();
+});
 
 // Set base url of the main router file, remove if you route file in on root diretory.
-// In that case the index.php is under http://mysite.com/test/QRoute
-QRoute::BaseURL('/test/QRoute'); 
+// In that case the index.php is under http://mysite.com/test/qroute
+QRoute::BaseURL('/test/qroute'); 
 
 QRoute::GET('/')
     ->setCallback(function () {
@@ -114,7 +122,7 @@ QRoute::GET('/hi/{name:(\d\d\d)}') // Example: /hi/007
     });    
 
 // Get with url params
-QRoute::GET('/hi/{name}')
+QRoute::GET('/hi/{name}') // URl Params always match the name on the callback function
     ->setQuery(['age']) // First group required, second group optional
     // Query params always goes as last argument on callback function
     ->setCallback(function ($name, $q) {               
@@ -122,19 +130,37 @@ QRoute::GET('/hi/{name}')
     });
 
 
-// Get without url params
-QRoute::GET('/hi/{name}')
-    ->setCallback(function ($name) {
-        return ['msg' => "Hello $name"];
+
+// All kind of params
+QRoute::PUT('/login/{url_param}')
+    ->setParams([], ['password'])
+    ->setQuery([], ['q1', 'q2' ])
+    ->setCallback(function ($url_param, $body_param, $query_param) {
+//        $password = $p['password'];
+//        $password = QRoute::InputPOST('password');
+//        parse_str(file_get_contents("php://input", "r"), $password);
+//        $password = $_POST;
+
+//        if ($passwd == $password) {
+//            $session->start();
+//        }
+        return [
+            'url_param' => $url_param,
+            'body_param' => $body_param,
+            'query_param' => $query_param
+        ];
     });
+    
 
-// Post with params
-QRoute::POST('/hi/{name}')
-    ->setParams(null, ['p1', 'p2']) // First group required, second group optional
-    // Post params always goes as last argument on callback function
-    ->setCallback(function ($name, $p) {
+// ADVANCED USAGE
 
-        return [$name, $p];
+// The url params will match: favicon.<any extension>
+QRoute::GET('/favicon(.)+')
+    ->setCallback(function (){
+        $png_base64 = 'iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAflBMVEUAAAD1RG72RW/2RW/1RG71RG71RG71RG71RG71RG71RG71RG71RG71RG71RG71RG71RG71RG71RG71RG71RG71RG71RG71RG71RG71RG71RG71RG71RG71RG71RG71RG71RG71RG71RG72RW/1RG71RG71RG71RG71RG7////ggj9AAAAAKHRSTlMA4gQFIy4TFMhyqNdfpz1PIoSpS4NhfDdgHzFGWicQP74NKAP8jMf9701eXgAAAAFiS0dEKcq3hSQAAAAHdElNRQflBxQEJyOYrVeCAAAAtUlEQVQ4y62T6w6CMAxGC6IORUSGooLiXd//CSW0oayL2RI5f0g/TrZCWoCO4GMRwJD/hXBiEfYvoykyY39OUdRVis6MWYgpUn7CYokkLCQUrcCLdI1kHGUUpSM1uckRzYKmqPBrcrtDSo5KivYjNem8wsngMw+5SSF7OIqpUn5CVSMngHNtUvk1KQamofLSC+JHaWvsnYIY+yuVN6MPuThtdDeWR6zeo42e7fP1S3iToDxO+ALNmDjmvWlyoAAAACV0RVh0ZGF0ZTpjcmVhdGUAMjAyMS0wNy0yMFQwNDozOTozNSswMDowMPxPFqcAAAAldEVYdGRhdGU6bW9kaWZ5ADIwMjEtMDctMjBUMDQ6Mzk6MzUrMDA6MDCNEq4bAAAAAElFTkSuQmCC';
+        $png_bin = base64_decode($png_base64);
+        
+        QRoute::HCALL('raw_png', $png_bin);
     });
 
 // Process all functions above. This is a mandatory function.
