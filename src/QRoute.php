@@ -57,10 +57,7 @@ namespace Quintao {
         {
             $content_type = @$_SERVER['CONTENT_TYPE'] ?: '';
             $input = file_get_contents("php://input", "r");
-
-//            echo "$content_type\n\n";
-//            echo $input;
-//            exit();
+            
             
             if (!empty($_POST)) {
                 return $_POST;
@@ -114,12 +111,8 @@ namespace Quintao {
             }
             
             $req_uri = rtrim($req_uri, "/ ");
-
-//            $base_url = rtrim($base_url, "/ ");
-//            self::$req['path'] = preg_replace("#^$base_url#", "", $req_uri);
+            
             self::$req['path'] = $req_uri;
-
-//            qDebug('REQUEST: ', self::$req, '-------------------------------------');
         }
         
         private static function match_url($url_pattern, $request_url, &$out = null)
@@ -281,7 +274,6 @@ namespace Quintao {
                             $this->match = null;
                             if (self::$func_error_bad_request !== null) {
                                 self::$func_return = call_user_func(self::$func_error_bad_request);
-//                                self::catchErrors();
                             }
                             return $this;
                         }
@@ -322,7 +314,6 @@ namespace Quintao {
                             $this->match = null;
                             if (self::$func_error_bad_request !== null) {
                                 self::$func_return = call_user_func(self::$func_error_bad_request);
-//                                self::catchErrors();
                             }
                             return $this;
                         }
