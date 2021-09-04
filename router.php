@@ -67,7 +67,7 @@ QRoute::HREGISTER('raw_png', function ($binary_data) {
 
 
 // Set base url of the main router file, remove if you route file in on root diretory.
-// In that case the routes.php is under http://mysite.com/qroute
+// In that case the router.php is under http://mysite.com/qroute
 QRoute::BaseURL('/qroute');
 
 QRoute::GET('/')
