@@ -24,6 +24,9 @@
 
 namespace Quintao {
     
+    use Error as ErrorAlias;
+    use ReflectionFunction;
+    
     class QRoute
     {
         private static $req = null;
@@ -50,6 +53,40 @@ namespace Quintao {
             }
         }
         
+        private static function get_body_content()
+        {
+            $content_type = @$_SERVER['CONTENT_TYPE'] ?: '';
+            $input = file_get_contents("php://input", "r");
+
+//            echo "$content_type\n\n";
+//            echo $input;
+//            exit();
+            
+            if (!empty($_POST)) {
+                return $_POST;
+            } elseif ($content_type === 'application/json') {
+                return json_decode($input, true);
+            } elseif ($content_type === 'application/x-www-form-urlencoded') {
+                parse_str($input, $tmp);
+                return $tmp;
+            } elseif (preg_match('/multipart\/form-data;\sboundary=(?<boundary>.*)$/', $content_type, $m)) {
+                $blocks = preg_split("/-+{$m['boundary']}-*/", $input, -1, PREG_SPLIT_NO_EMPTY);
+                array_pop($blocks);
+                
+                $data = [];
+                foreach ($blocks as $id => $block) {
+                    if (empty($block)) {
+                        continue;
+                    }
+                    if (preg_match('/Content-Disposition:\sform-data;\sname=\"(?<name>[^\"]*)\"[\n|\r]+(?<value>[^\n\r].*)?\r?$/s', trim($block), $matches)) {
+                        $data[$matches['name']] = $matches['value'];
+                    }
+                }
+                return $data;
+            }
+            return [];
+        }
+        
         private static function parse_request()
         {
             self::$req['method'] = $_SERVER['REQUEST_METHOD'];
@@ -67,11 +104,8 @@ namespace Quintao {
                     self::$req['params'] = $_GET;
                     break;
                 case 'POST':
-                    self::$req['params'] = $_POST;
-                    break;
                 case 'PUT':
-                    parse_str(file_get_contents("php://input", "r"), $put_params);
-                    self::$req['params'] = $put_params;
+                    self::$req['params'] = self::get_body_content();
                     break;
             }
             
@@ -92,12 +126,12 @@ namespace Quintao {
         {
 //            static $COMPILE_REGEX = /** @lang PhpRegExpCommentMode */
 //                '@(?<=/){(?<var>[a-z0-9_]+):?(?<reg>(?:\[[\w\d\-\\\./]+\](?:\+|\*|{(?:[0-9]+|[0-9]+,[0-9]*)})?)+|)}(?=\s*(?:/|$))@ix';
+
+//            static $COMPILE_REGEX = /** @lang PhpRegExp */
+//                '@(?<=/){(?<var>[a-z0-9_]+):?(?<reg>(?:(?:\[{0,1}[\w\d\-\\\./]+\]{0,1}(?:\+|\*|{(?:[0-9]+|[0-9]+,[0-9]*)})?)+|(?:\({0,1}[\w\d\-\\\./\[\]]+\){0,1}(?:\+|\*|{(?:[0-9]+|[0-9]+,[0-9]*)})?)+)+|)}(?=\s*(?:/|$))@ix';
             
             static $COMPILE_REGEX = /** @lang PhpRegExp */
-                '@(?<=/){(?<var>[a-z0-9_]+):?(?<reg>(?:(?:\[{0,1}[\w\d\-\\\./]+\]{0,1}(?:\+|\*|{(?:[0-9]+|[0-9]+,[0-9]*)})?)+|(?:\({0,1}[\w\d\-\\\./\[\]]+\){0,1}(?:\+|\*|{(?:[0-9]+|[0-9]+,[0-9]*)})?)+)+|)}(?=\s*(?:/|$))@ix';
-            
-            static $COMPILE_REGEX = /** @lang PhpRegExp */
-                '@{(?<var>[a-z0-9_]+):?(?<reg>(?:(?:\[{0,1}[\w\d\-\\\./]+\]{0,1}(?:\+|\*|{(?:[0-9]+|[0-9]+,[0-9]*)})?)+|(?:\({0,1}[\w\d\-\\\./\[\]]+\){0,1}(?:\+|\*|{(?:[0-9]+|[0-9]+,[0-9]*)})?)+)+|)}@ix';
+                '@{(?<var>[a-z0-9_]+):?(?<reg>(?:(?:\[?[\w\d\-\\\./]+\]?(?:\+|\*|{(?:[0-9]+|[0-9]+,[0-9]*)})?)+|(?:\(?[\w\d\-\\\./\[\]]+\)?(?:\+|\*|{(?:[0-9]+|[0-9]+,[0-9]*)})?)+)+|)}@ix';
 
 
 //            qDebug('URL_PATTERN: ', $url_pattern);
@@ -174,12 +208,12 @@ namespace Quintao {
         
         static function BaseURL($url)
         {
-            self::$BaseURL = $url;
+            self::$BaseURL = rtrim($url, " \t\n\r\0\x0B/");
         }
         
         static function SubURL($url)
         {
-            self::$SubURL = $url;
+            self::$SubURL = rtrim($url, " \t\n\r\0\x0B/");
         }
         
         static function HandleReturn($callback)
@@ -236,7 +270,7 @@ namespace Quintao {
          * @param bool $showEmptyOptionals
          * @return $this
          */
-        public function setParams($required = null, $optional = null, $showEmptyOptionals = true)
+        public function setParams(array $required = null, $optional = null, $showEmptyOptionals = true)
         {
             if ($this->match !== null) {
                 if (!empty($required)) {
@@ -312,21 +346,51 @@ namespace Quintao {
         
         
         /**
+         * Set callback function
+         *
+         * Urls Params go first matched by name, body parameters go next and query params are the last. <br><br>
+         *
+         * Example: function ($url_param1, $url_param2, $body_params, $query_params)
          * @param callable $callback
          */
-        function setCallback($callback)
+        function setCallback(callable $callback)
         {
             if ($this->match !== null) {
-                
-                if ($this->params !== null) {
-                    $this->match['_params'] = $this->params;
+                $url_params_count = count($this->match);
+                try {
+                    $f = new ReflectionFunction($callback);
+                    
+                    $params_count = $f->getNumberOfParameters();
+                    
+                    $params = $f->getParameters();
+                    
+                    foreach ($params as $param){
+                        $name = $param->getName();
+                        if(!array_key_exists($name, $this->match)){
+                            $this->match[$name] = null;
+                        }
+                    }
+                    array_splice($params, 0, $url_params_count);
+                    
+                    $index = 0;
+                    if ($this->params !== null) {
+                        if (array_key_exists($index, $params)) {
+                            $this->match[$params[$index]->getName()] = $this->params;
+                            $index++;
+                        }
+                    }
+                    if ($this->query !== null) {
+                        if (array_key_exists($index, $params)) {
+                            $this->match[$params[$index]->getName()] = $this->query;
+                        }
+                    }
+                    
+                } catch (\Exception $e) {
+                    qdd($e);
                 }
-                if ($this->query !== null) {
-                    $this->match['_query'] = $this->query;
-                }
-                
+    
                 self::$func_return = call_user_func_array($callback, $this->match);
-                
+    
                 if (self::$func_return === null) {
                     self::$func_return = '';
                 }
@@ -354,13 +418,26 @@ namespace Quintao {
                 call_user_func(self::$func_handle_return, call_user_func(self::$func_error_not_found));
             }
         }
-        
-        
+    
+    
+        /**
+         * Send a raw HTTP header
+         * @param array $headers
+         */
         static function HEADERS($headers = array())
         {
             foreach ($headers as $name => $value) {
                 header("{$name}: {$value}");
             }
+        }
+    
+        /**
+         * Set the HTTP response code
+         * @param int $code The optional response_code will set the response code.
+         */
+        static function STATUS($code = 200)
+        {
+            http_response_code($code);
         }
         
         /**
@@ -375,7 +452,7 @@ namespace Quintao {
             if (!isset($_GET[$var]) || empty($_GET[$var])) {
                 return $default;
             } else {
-                return $_GET[$var];
+                return @$_GET[$var] ?: $default;
             }
         }
         
@@ -387,16 +464,28 @@ namespace Quintao {
          */
         static function InputPOST($var, $default = null)
         {
-            if (!isset($_POST[$var]) || empty($_POST[$var])) {
+            $post = self::get_body_content();
+            if (empty($post)) {
                 return $default;
             } else {
-                return $_POST[$var];
+                return @$post[$var] ?: $default;
             }
         }
         
     }
     
-    function qDebug($msg, ...$values) {
+    function qdd(...$values)
+    {
+        header('Content-Type: text/plain');
+        foreach ($values as $value) {
+            print_r($value);
+            echo "\n";
+        }
+        exit();
+    }
+    
+    function qDebug($msg, ...$values)
+    {
         $str = "$msg ";
         foreach ($values as $value) {
             $str .= print_r($value, 1);
@@ -407,7 +496,10 @@ namespace Quintao {
         $str .= print_r("\n", 1);
         
         
-        if (php_sapi_name() === 'cli') echo $str;
-        else echo "<pre>{$str}</pre>";
+        if (php_sapi_name() === 'cli') {
+            echo $str;
+        } else {
+            echo "<pre>{$str}</pre>";
+        }
     }
 }

@@ -1,50 +1,8 @@
-# QRoute
+<?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
-Lightweight, simple and powerful PHP route library. Just one file.
-
-## Installation
-
-Navigate to your project folder in terminal and run the following command:
-
-`composer require quintao/qroute`
-
-### Setting up Apache
-
-Make sure the `mod_rewrite` module (htaccess support) is enabled in the Apache configuration.
-
-Simply create a new `.htaccess` file in your projects public directory and paste the contents below in your newly
-created file. This will redirect all requests to your `index.php` file.
-
-```apache
-RewriteEngine on
-RewriteCond %{SCRIPT_FILENAME} !-f
-RewriteCond %{SCRIPT_FILENAME} !-d
-RewriteCond %{SCRIPT_FILENAME} !-l
-RewriteRule ^(.*)$ router.php/$1
-```
-
-### Settings up Nginx
-
-You can enable url-rewriting by adding the following configuration for the Nginx configuration-file.
-
-```nginx
-location / {
-    try_files $uri $uri/ /router.php?$query_string;
-}
-```
-
-### Supported methods
-
-* GET
-* POST
-* PUT
-* PATCH
-* DELETE
-* OPTIONS
-
-## Routes Example
-
-```php
 require 'vendor/autoload.php';
 
 use Quintao\QRoute;
@@ -147,6 +105,21 @@ QRoute::POST('/login/{url_param1}/{url_param2}')
         
     });
 
+// All kind of params
+QRoute::PUT('/login/{url_param1}/{url_param2}')
+    ->setParams([], ['username', 'password'])
+    ->setQuery([], ['q1', 'q2'])
+    // Urls Params go first matched by name, body parameters go next and query params are the last.
+    ->setCallback(function ($url_param1, $url_param2, $body_params, $query_params) {
+        return [
+            'url_param1' => $url_param1,
+            'url_param2' => $url_param2,
+            'body_params' => $body_params,
+            'query_params' => $query_params
+        ];
+        
+    });
+
 
 // The url params will match: favicon.<any extension>
 QRoute::GET('/favicon.(.+)')
@@ -183,5 +156,3 @@ QRoute::GET('/again')
 // Process all functions above. This is a mandatory function.
 // This needs to be the last function and is called only once.
 QRoute::finish();
-
-```
