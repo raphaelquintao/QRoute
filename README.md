@@ -118,7 +118,7 @@ QRoute::GET('/')
     });
 
 // Get with params and regex
-QRoute::GET('/im/{name:(\d\d\d)}') // Example: /hi/007
+QRoute::GET('/im/{name:(\d\d\d)}') // Example: /im/007
 ->setCallback(function ($name) {
     return ['msg' => "Hello agent $name!"];
 });
