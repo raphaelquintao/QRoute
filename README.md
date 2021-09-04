@@ -1,6 +1,6 @@
 # QRoute
 
-Lightweight, simple and powerful PHP route library. Just one file.
+Lightweight, simple and powerful PHP Router library. Just one file.
 
 ## Installation
 
