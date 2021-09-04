@@ -23,7 +23,7 @@ RewriteCond %{SCRIPT_FILENAME} !-l
 RewriteRule ^(.*)$ router.php/$1
 ```
 
-### Settings up Nginx
+### Setting up Nginx
 
 You can enable url-rewriting by adding the following configuration for the Nginx configuration-file.
 
