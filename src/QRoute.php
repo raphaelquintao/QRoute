@@ -29,6 +29,7 @@ namespace Quintao {
     
     class QRoute
     {
+        public static $VERSION = '1.27';
         private static $req = null;
         private static $func_return = null;
         
@@ -191,7 +192,7 @@ namespace Quintao {
         static function HCALL($key, ...$params)
         {
             if (!isset(self::$helper_functions[$key])) {
-                exit('HELPER FUNCTION NOT FOUND');
+                exit("HELPER FUNCTION NOT FOUND: $key");
             }
             $func = self::$helper_functions[$key];
             
@@ -467,9 +468,9 @@ namespace Quintao {
     
     function qdd(...$values)
     {
-        header('Content-Type: text/plain');
+        header("Content-Type: application/json");
         foreach ($values as $value) {
-            print_r($value);
+            echo $value;
             echo "\n";
         }
         exit();
