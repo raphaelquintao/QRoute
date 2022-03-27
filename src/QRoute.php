@@ -29,7 +29,7 @@ namespace Quintao {
     
     class QRoute
     {
-        public static $VERSION = '1.27';
+        public static $VERSION = '1.28';
         private static $req = null;
         private static $func_return = null;
         
@@ -266,18 +266,29 @@ namespace Quintao {
          */
         public function setParams(array $required = null, $optional = null, $showEmptyOptionals = true)
         {
+            
             if ($this->match !== null) {
+                $missing_params = [
+                    'body' => []
+                ];
                 if (!empty($required)) {
                     foreach ($required as $p_req_name) {
                         if (isset(self::$req['params'][$p_req_name])) {
                             $this->params[$p_req_name] = self::$req['params'][$p_req_name];
                         } else {
+                            $missing_params['body'][] = $p_req_name;
                             $this->match = null;
-                            if (self::$func_error_bad_request !== null) {
-                                self::$func_return = call_user_func(self::$func_error_bad_request);
-                            }
-                            return $this;
+                            // if (self::$func_error_bad_request !== null) {
+                            //     self::$func_return = call_user_func(self::$func_error_bad_request);
+                            // }
+                            // return $this;
                         }
+                    }
+                    if(sizeof($missing_params['body']) > 0){
+                        if (self::$func_error_bad_request !== null) {
+                            self::$func_return = call_user_func(self::$func_error_bad_request, $missing_params);
+                        }
+                        return $this;
                     }
                 }
                 if (!empty($optional)) {
@@ -307,17 +318,27 @@ namespace Quintao {
         public function setQuery($required = null, $optional = null, $showEmptyOptionals = true)
         {
             if ($this->match !== null) {
+                $missing_params = [
+                    'query' => []
+                ];
                 if (!empty($required)) {
                     foreach ($required as $p_req_name) {
                         if (isset(self::$req['query'][$p_req_name])) {
                             $this->query[$p_req_name] = self::$req['query'][$p_req_name];
                         } else {
+                            $missing_params['query'][] = $p_req_name;
                             $this->match = null;
-                            if (self::$func_error_bad_request !== null) {
-                                self::$func_return = call_user_func(self::$func_error_bad_request);
-                            }
-                            return $this;
+                            // if (self::$func_error_bad_request !== null) {
+                            //     self::$func_return = call_user_func(self::$func_error_bad_request);
+                            // }
+                            // return $this;
                         }
+                    }
+                    if(sizeof($missing_params['query']) > 0){
+                        if (self::$func_error_bad_request !== null) {
+                            self::$func_return = call_user_func(self::$func_error_bad_request, $missing_params);
+                        }
+                        return $this;
                     }
                 }
                 if (!empty($optional)) {
@@ -380,9 +401,9 @@ namespace Quintao {
                 } catch (\Exception $e) {
                     qdd($e);
                 }
-    
+                
                 self::$func_return = call_user_func_array($callback, $this->match);
-    
+                
                 if (self::$func_return === null) {
                     self::$func_return = '';
                 }
@@ -410,8 +431,8 @@ namespace Quintao {
                 call_user_func(self::$func_handle_return, call_user_func(self::$func_error_not_found));
             }
         }
-    
-    
+        
+        
         /**
          * Send a raw HTTP header
          * @param array $headers
@@ -422,7 +443,7 @@ namespace Quintao {
                 header("{$name}: {$value}");
             }
         }
-    
+        
         /**
          * Set the HTTP response code
          * @param int $code The optional response_code will set the response code.
